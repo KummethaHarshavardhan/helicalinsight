@@ -70,15 +70,53 @@ public class MongoDrillLoader extends NoSQLLoader {
     }
 
     private String getHostPort(String uri, boolean isHost) {
-        String splitArray[] = uri.split(":");
-        if (splitArray.length >= 3) {
-            if (isHost)
-                return splitArray[1].replace("//", "");
-            else
-                return splitArray[2].substring(0, splitArray[2].indexOf("/"));
-        }
+    if (StringUtils.isEmpty(uri)) {
         return "";
     }
+
+    // MongoDB Atlas / SRV connection string
+    if (uri.startsWith("mongodb+srv://")) {
+        String connectionPart = uri.substring("mongodb+srv://".length());
+
+        int slashIndex = connectionPart.indexOf("/");
+        if (slashIndex >= 0) {
+            connectionPart = connectionPart.substring(0, slashIndex);
+        }
+
+        // Remove credentials if present
+        int atIndex = connectionPart.lastIndexOf("@");
+        if (atIndex >= 0) {
+            connectionPart = connectionPart.substring(atIndex + 1);
+        }
+
+        if (isHost) {
+            return connectionPart;
+        }
+
+        // SRV URLs don't have a fixed port
+        return "";
+    }
+
+    // Existing mongodb:// support
+    String splitArray[] = uri.split(":");
+
+    if (splitArray.length >= 3) {
+        if (isHost) {
+            return splitArray[1].replace("//", "");
+        } else {
+            String portPart = splitArray[2];
+
+            int slashIndex = portPart.indexOf("/");
+            if (slashIndex >= 0) {
+                return portPart.substring(0, slashIndex);
+            }
+
+            return portPart;
+        }
+    }
+
+    return "";
+}
 
     @Override
     public boolean testConnection(JsonObject formData) {
