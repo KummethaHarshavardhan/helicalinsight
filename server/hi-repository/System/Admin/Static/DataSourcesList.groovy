@@ -24,12 +24,31 @@ def staticDataSources = '''[ {
 "parameters": {
 "port": "27017",
 "hostName": "localhost",
-"database": "",
-"collection": "collection",
-"sslPort": "3345"
+"database": "database",
+"collection":"collection",
+"sslPort":"3345"
 },
+
 "dataSourceProvider": "noSql"
-} ]''';
+},
+{
+"name": "Mongodb Atlas",
+"classifier": "global",
+"categoryName": "No SQL & Big Data",
+"categoryType": "nosql_bigdata",
+"type": "global.jdbc",
+"driver": "com.helicalinsight.nosql.mongo",
+"url": "mongodb+srv://{{hostName}}/{{database}}",
+"parameters": {
+"hostName": "cluster0.xxxxx.mongodb.net",
+"database": "database",
+"collection":"collection"
+},
+
+"dataSourceProvider": "noSql"
+}
+
+]''';
 
 
 def supportedArray = ["Oracle", "Mysql", "Apache Drill", "Microsoft Sqlserver",
